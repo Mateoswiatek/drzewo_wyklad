@@ -63,14 +63,14 @@ void wypisz(struct element_drzewa *root){
     wypisz(root->prawy);
 }
 //ok
-void znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dziala, ale buja
+struct element_drzewa *znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dziala, ale buja
     if(root==0){
-        printf("nie ma zadnego elementu w drzewie");
-        return;
+        printf("nie ma elementu w drzewie\n");
+        return 0;
     }
     if (szukana == root->wartosc) {
         printf("%0.2lf\n", root->wartosc);
-        return;
+        return root;
     } else if (szukana < root->wartosc) {
         znajdz(root->lewy, szukana);
     } else {
@@ -78,8 +78,24 @@ void znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dzial
     }
 }
 
-void usun(struct element_drzewa *root, double do_usuniecia){
-    znajdz(root, do_usuniecia)
+void usun(struct element_drzewa *root, double szukana_do_usuniecia){
+    struct element_drzewa *do_usuniecia, *prawe, *lewe;
+    if(szukana_do_usuniecia==root->wartosc){
+        printf("nie mozna usunac pierwszej wartosci\n");
+        return;
+    }
+    do_usuniecia = znajdz(root, szukana_do_usuniecia);
+    if(do_usuniecia==0) return; // bo znajdz nam juz pisze ze nie ma
+    lewe=do_usuniecia->lewy;
+    prawe=do_usuniecia->prawy;
+    // usunac do_usuniecia;
+    if(lewe!=0){
+        wstaw(&lewe, lewe->wartosc, 1);
+    }
+    if(prawe!=0){
+        wstaw(&prawe, prawe->wartosc, 1);
+    }
+
 }
 
 int main() {
@@ -96,7 +112,7 @@ int main() {
                 printf("podaj wartosc: \n");
                 scanf("%lf", &wartosc);
 
-                wstaw(&drzewko, wartosc);
+                wstaw(&drzewko, wartosc, 0);
                 break;
 
             case 1:
@@ -114,7 +130,9 @@ int main() {
                 break;
 
             case 3:
-                printf("3\n");
+                printf("podaj wartosc:\n");
+                scanf("%lf", &wartosc);
+                usun(drzewko, wartosc);
                 break;
 
             case 4:
