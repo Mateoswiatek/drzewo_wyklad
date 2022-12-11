@@ -4,7 +4,7 @@
 
 #define EXIT 6
 
-struct element_drzewa *drzewko, *poprzedni_u, *skopiowane;
+struct element_drzewa *drzewko, *poprzedni_u, *kopiowane;
 int a;
 
 /*
@@ -57,11 +57,12 @@ void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb, struct ele
     }
 }
 //ok
-void wypisz(struct element_drzewa *root){
+void wypisz(struct element_drzewa *root, int tryb){ //0 - wypisz, 1 - skopiuj
     if(root==0) return;
-    wypisz(root->lewy); // wchodzimy do lewego, i od nowa sprawdzamy, jak juz dojdziemy do konca to wypisujemy lewy
+    wypisz(root->lewy, tryb); // wchodzimy do lewego, i od nowa sprawdzamy, jak juz dojdziemy do konca to wypisujemy lewy
     printf("%0.2lf\n", root->wartosc); // jak wypisalismy to sprawdzamy prawa czesc
-    wypisz(root->prawy);
+    if(tryb) wstaw(&kopiowane, root->wartosc, 0, 0);
+    wypisz(root->prawy, tryb);
 }
 //ok
 struct element_drzewa *znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dziala, ale buja
@@ -111,15 +112,9 @@ void usun(struct element_drzewa *root, double szukana_do_usuniecia){
     }
 }
 //ok
-struct element_drzewa *skopiuj(struct element_drzewa *zrodlo){
-    struct element_drzewa *nowe_drzewo;
-
-    nowe_drzewo= malloc(sizeof(struct element_drzewa));
-    nowe_drzewo->wartosc=0; // tu mozna sprobowac dac zrodlo->wartosc;
-    nowe_drzewo->lewy=nowe_drzewo->prawy=0;
-    skopiowane=nowe_drzewo;
-    wstaw(&skopiowane, zrodlo->wartosc, 1, zrodlo);
-    return skopiowane;
+void skopiuj(struct element_drzewa *zrodlo){ // tak jakby wypisujemy wszystkie, ale nie wypisujemy tylko dodajemy je do "kopiowanego drzewaa"
+    wypisz(zrodlo, 1);
+    return;
 }
 
 int main() {
@@ -127,7 +122,8 @@ int main() {
     double wartosc;
 
     while(1){
-        printf("co cheesz zrobic: 0 - wstawic do drzewa 1 - wyswietlic 2 - znalezc 3 - usunac 4 - skopiowac drzezwo 5 - dodac drzewo %d - wyjscie", EXIT);
+        //printf("co cheesz zrobic: 0 - wstawic do drzewa 1 - wyswietlic 2 - znalezc 3 - usunac 4 - skopiowac drzezwo 5 - dodac drzewo %d - wyjscie", EXIT);
+        printf("co cheesz zrobic:\n0 - wstawic do drzewa\n1 - wyswietlic\n2 - znalezc\n3 - usunac\n4 - skopiowac drzezwo\n5 - dodac drzewo\n%d - wyjscie", EXIT);
         scanf("%d", &wybor);
 
         switch(wybor) {
@@ -143,7 +139,7 @@ int main() {
                     printf("nie ma zadnego elementu\n");
                     break;
                 }
-                wypisz(drzewko);
+                wypisz(drzewko,0);
                 break;
 
             case 2:
@@ -161,9 +157,9 @@ int main() {
             case 4:
                 skopiuj(drzewko);
                 printf("zrodlo ma roota w %u\n a tu jego zawartosc:\n", drzewko);
-                wypisz(drzewko);
-                printf("nowo skopiowany ma roota w %u\n a tu jego zawartosc:\n", skopiowane);
-                wypisz(skopiowane);
+                wypisz(drzewko, 0);
+                printf("nowo skopiowany ma roota w %u\n a tu jego zawartosc:\n", kopiowane);
+                wypisz(kopiowane, 0);
                 break;
 
             case 5:
