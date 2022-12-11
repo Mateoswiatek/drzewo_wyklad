@@ -4,13 +4,13 @@
 
 #define EXIT 6
 
-
+int k =0;
 
 /*
  *              wstaw do drzewa  // pierwsze nie moze byc 0;
  *              wyswietl
  *              znajdz
- *  usun   // wstawianie pozniej te usuniete,
+ *       usun       // plan byl by zamieszac dosc grubo, aby dzieci usunietej matki dodawac do matki usunietej matki XD
  *  skopiuj drzewo
  *  doda jdrzewa
  */
@@ -19,18 +19,15 @@ struct element_drzewa{ //binary tree
     struct element_drzewa *lewy, *prawy;
 };
 
+struct element_drzewa *poprzedni_u;
+
 //ok
-void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb){ // 0-wstawianie nowego, 1- wstawianie elementow
+void wstaw(struct element_drzewa **poczatkowy, double dana){
     struct element_drzewa *nowy, *wskaznik;
     wskaznik=*poczatkowy;
-    if(tryb==0) {
-        nowy = malloc(sizeof(struct element_drzewa));
-        nowy->wartosc = dana;
-        nowy->lewy = nowy->prawy = 0;
-    }
-    if(tryb==1){
-
-    }
+    nowy=malloc(sizeof(struct element_drzewa));
+    nowy->wartosc=dana;
+    nowy->lewy=nowy->prawy=0;
     if(!wskaznik) *poczatkowy=nowy; // jeśli nie ma żadnego elementu, no to nowo utworzony bedzie korzeniem
     else{
         while(1){
@@ -56,30 +53,52 @@ void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb){ // 0-wsta
     }
 }
 //ok
-void wypisz(struct element_drzewa *root){
+void wypisz(struct element_drzewa *root, int tryb){ // 1 - do usuwania
+
     if(root==0) return;
-    wypisz(root->lewy); // wchodzimy do lewego, i od nowa sprawdzamy, jak juz dojdziemy do konca to wypisujemy lewy
+    wypisz(root->lewy, tryb); // wchodzimy do lewego, i od nowa sprawdzamy, jak juz dojdziemy do konca to wypisujemy lewy
     printf("%0.2lf\n", root->wartosc); // jak wypisalismy to sprawdzamy prawa czesc
-    wypisz(root->prawy);
+    if (tryb==1){
+        poprzedni_u->lewy=0;
+        wstaw(poprzedni_u, root->wartosc);
+    }
+    wypisz(root->prawy, tryb);
+    if (tryb==1){
+        poprzedni_u->prawy=0;
+        wstaw(poprzedni_u, root->wartosc);
+    }
 }
 //ok
-void znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dziala, ale buja
+struct element_drzewa *znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dziala, ale buja
     if(root==0){
-        printf("nie ma zadnego elementu w drzewie");
-        return;
+        printf("nie ma elementu w drzewie\n");
+        return 0;
     }
     if (szukana == root->wartosc) {
+        printf("znaleziony to %u\n", root);
         printf("%0.2lf\n", root->wartosc);
-        return;
+        return root;
     } else if (szukana < root->wartosc) {
+        poprzedni_u=root;
+        printf("poprzedni root to niby %u\n", poprzedni_u);
         znajdz(root->lewy, szukana);
     } else {
+        poprzedni_u=root;
+        printf("poprzedni root to niby %u\n", poprzedni_u);
         znajdz(root->prawy, szukana);
     }
 }
 
-void usun(struct element_drzewa *root, double do_usuniecia){
-    znajdz(root, do_usuniecia)
+void usun(struct element_drzewa *root, double szukana_do_usuniecia){
+    struct element_drzewa *do_usuniecia;
+    do_usuniecia = znajdz(root, szukana_do_usuniecia);
+    if(do_usuniecia==0) return; // bo znajdz nam juz pisze ze nie ma
+    //zwolnic miejsce
+    wypisz(do_usuniecia->lewy, 1);
+
+    wypisz(do_usuniecia->prawy, 1);
+
+    printf("%.02lf\n", do_usuniecia->wartosc);
 }
 
 int main() {
@@ -104,7 +123,7 @@ int main() {
                     printf("nie ma zadnego elementu\n");
                     break;
                 }
-                wypisz(drzewko);
+                wypisz(drzewko,0);
                 break;
 
             case 2:
@@ -114,7 +133,9 @@ int main() {
                 break;
 
             case 3:
-                printf("3\n");
+                printf("podaj wartosc:\n");
+                scanf("%lf", &wartosc);
+                usun(drzewko, wartosc);
                 break;
 
             case 4:
@@ -129,6 +150,8 @@ int main() {
                 return 0;
         }
     }
+
+
 
     return 0;
 }
