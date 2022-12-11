@@ -1,7 +1,19 @@
 #include <stdio.h>
 #include <malloc.h>
+#include <stdbool.h>
 
 #define EXIT 6
+
+
+
+/*
+ *              wstaw do drzewa  // pierwsze nie moze byc 0;
+ *              wyswietl
+ *              znajdz
+ *  usun
+ *  skopiuj drzewo
+ *  doda jdrzewa
+ */
 struct element_drzewa{ //binary tree
     double wartosc;
     struct element_drzewa *lewy, *prawy;
@@ -9,7 +21,7 @@ struct element_drzewa{ //binary tree
 
 //ok
 void wstaw(struct element_drzewa **poczatkowy, double dana){
-    struct element_drzewa *nowy, *wskaznik, *nastepny;
+    struct element_drzewa *nowy, *wskaznik;
     wskaznik=*poczatkowy;
     nowy=malloc(sizeof(struct element_drzewa));
     nowy->wartosc=dana;
@@ -45,7 +57,21 @@ void wypisz(struct element_drzewa *root){
     printf("%0.2lf\n", root->wartosc); // jak wypisalismy to sprawdzamy prawa czesc
     wypisz(root->prawy);
 }
-
+//ok
+void znajdz(struct element_drzewa *root, double szukana){ // niby wiem jak dziala, ale buja
+    if(root==0){
+        printf("nie ma zadnego elementu w drzewie");
+        return;
+    }
+    if (szukana == root->wartosc) {
+        printf("%0.2lf\n", root->wartosc);
+        return;
+    } else if (szukana < root->wartosc) {
+        znajdz(root->lewy, szukana);
+    } else {
+        znajdz(root->prawy, szukana);
+    }
+}
 
 
 
@@ -62,20 +88,32 @@ int main() {
             case 0:
                 printf("podaj wartosc: \n");
                 scanf("%lf", &wartosc);
+
                 wstaw(&drzewko, wartosc);
                 break;
+
             case 1:
+                if(!drzewko) {
+                    printf("nie ma zadnego elementu\n");
+                    break;
+                }
                 wypisz(drzewko);
                 break;
+
             case 2:
-                printf("2\n");
+                printf("podaj wartosc:\n");
+                scanf("%lf", &wartosc);
+                znajdz(drzewko, wartosc);
                 break;
+
             case 3:
                 printf("3\n");
                 break;
+
             case 4:
                 printf("4\n");
                 break;
+
             case 5:
 
                 break;
