@@ -4,7 +4,8 @@
 
 #define EXIT 6
 
-
+struct element_drzewa *drzewko, *poprzedni_u;
+int a;
 
 /*
  *              wstaw do drzewa  // pierwsze nie moze byc 0;
@@ -20,18 +21,18 @@ struct element_drzewa{ //binary tree
 };
 
 //ok
-void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb){ // 0-wstawianie nowego, 1- wstawianie elementow
+void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb, struct element_drzewa *ws_dziecka){ // 0-wstawianie nowego, 1- wstawianie elementow
     struct element_drzewa *nowy, *wskaznik;
     wskaznik=*poczatkowy;
-    if(tryb==0) {
+    if(tryb) {
+        nowy=ws_dziecka;
+    }else{
         nowy = malloc(sizeof(struct element_drzewa));
         nowy->wartosc = dana;
         nowy->lewy = nowy->prawy = 0;
     }
-    if(tryb==1){
 
-    }
-    if(!wskaznik) *poczatkowy=nowy; // jeśli nie ma żadnego elementu, no to nowo utworzony bedzie korzeniem
+    if(tryb==0 && !wskaznik) *poczatkowy=nowy; // jeśli nie ma żadnego elementu, no to nowo utworzony bedzie korzeniem
     else{
         while(1){
             if(dana < wskaznik->wartosc){ // jesli dana jest mniejsza od tego co jest w danym elemencie
@@ -72,8 +73,14 @@ struct element_drzewa *znajdz(struct element_drzewa *root, double szukana){ // n
         printf("%0.2lf\n", root->wartosc);
         return root;
     } else if (szukana < root->wartosc) {
+        poprzedni_u=root;
+        a=0;
+        printf("poprzedni root to niby %u\n", poprzedni_u);
         znajdz(root->lewy, szukana);
     } else {
+        poprzedni_u=root;
+        a=1;
+        printf("poprzedni root to niby %u\n", poprzedni_u);
         znajdz(root->prawy, szukana);
     }
 }
@@ -88,23 +95,28 @@ void usun(struct element_drzewa *root, double szukana_do_usuniecia){
     if(do_usuniecia==0) return; // bo znajdz nam juz pisze ze nie ma
     lewe=do_usuniecia->lewy;
     prawe=do_usuniecia->prawy;
-    // usunac do_usuniecia;
-    if(lewe!=0){
-        wstaw(&lewe, lewe->wartosc, 1);
+    if(a){
+        poprzedni_u->prawy=0;
     }
-    if(prawe!=0){
-        wstaw(&prawe, prawe->wartosc, 1);
+    else{
+        poprzedni_u->lewy=0;
     }
 
+    free(do_usuniecia);
+    if(lewe!=0){
+        wstaw(&drzewko, lewe->wartosc, 1, lewe);
+    }
+    if(prawe!=0){
+        wstaw(&drzewko, prawe->wartosc, 1, prawe);
+    }
 }
 
 int main() {
-    struct element_drzewa *drzewko;
     int wybor;
     double wartosc;
 
     while(1){
-        printf("co cheesz zrobic:\n0 - wstawic do drzewa\n1 - wyswietlic\n2 - znalezc\n3 - usunac\n4 - skopiowac drzezwo\n5 - dodac drzewo\n%d - wyjscie", EXIT);
+        printf("co cheesz zrobic: 0 - wstawic do drzewa 1 - wyswietlic 2 - znalezc 3 - usunac 4 - skopiowac drzezwo 5 - dodac drzewo %d - wyjscie", EXIT);
         scanf("%d", &wybor);
 
         switch(wybor) {
@@ -112,7 +124,7 @@ int main() {
                 printf("podaj wartosc: \n");
                 scanf("%lf", &wartosc);
 
-                wstaw(&drzewko, wartosc, 0);
+                wstaw(&drzewko, wartosc, 0, 0);
                 break;
 
             case 1:
