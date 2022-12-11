@@ -12,14 +12,13 @@ int a;
  *              wyswietl
  *              znajdz
  *              usun   // wstawianie pozniej te usuniete przekazujemy wartosc, jako od kotrej zaczynamy, a zamiast nowo utworzonego, mamy wskaznik do "poczaktu" jednego z dziecka z tego usunietego,
- *  skopiuj drzewo
- *  doda jdrzewa
+ *              skopiuj drzewo
+ *              dodaj drzewa
  */
 struct element_drzewa{ //binary tree
     double wartosc;
     struct element_drzewa *lewy, *prawy;
 };
-
 //ok
 void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb, struct element_drzewa *ws_dziecka){ // 0-wstawianie nowego, 1- wstawianie elementow
     struct element_drzewa *nowy, *wskaznik;
@@ -57,11 +56,18 @@ void wstaw(struct element_drzewa **poczatkowy, double dana, int tryb, struct ele
     }
 }
 //ok
-void wypisz(struct element_drzewa *root, int tryb){ //0 - wypisz, 1 - skopiuj
+void wypisz(struct element_drzewa *root, int tryb){ //0 - wypisz, 1 - skopiuj 2 - usuwanie
     if(root==0) return;
     wypisz(root->lewy, tryb); // wchodzimy do lewego, i od nowa sprawdzamy, jak juz dojdziemy do konca to wypisujemy lewy
-    printf("%0.2lf\n", root->wartosc); // jak wypisalismy to sprawdzamy prawa czesc
-    if(tryb) wstaw(&kopiowane, root->wartosc, 0, 0);
+    if(tryb==1){
+        wstaw(&kopiowane, root->wartosc, 0, 0);
+    }
+    else if(tryb==0){
+        printf("%0.2lf\n", root->wartosc); // jak wypisalismy to sprawdzamy prawa czesc
+    }
+    if(tryb==2){
+        free(root);
+    }
     wypisz(root->prawy, tryb);
 }
 //ok
@@ -76,12 +82,12 @@ struct element_drzewa *znajdz(struct element_drzewa *root, double szukana){ // n
     } else if (szukana < root->wartosc) {
         poprzedni_u=root;
         a=0;
-        printf("poprzedni root to niby %u\n", poprzedni_u);
+        //printf("poprzedni root to niby %u\n", poprzedni_u);
         znajdz(root->lewy, szukana);
     } else {
         poprzedni_u=root;
         a=1;
-        printf("poprzedni root to niby %u\n", poprzedni_u);
+        //printf("poprzedni root to niby %u\n", poprzedni_u);
         znajdz(root->prawy, szukana);
     }
 }
@@ -116,6 +122,10 @@ void skopiuj(struct element_drzewa *zrodlo){ // tak jakby wypisujemy wszystkie, 
     wypisz(zrodlo, 1);
     return;
 }
+//ok
+void dodaj_drzewa(struct element_drzewa *do_ktorego, struct element_drzewa *jakie_drzewo){
+    wstaw(&do_ktorego, jakie_drzewo->wartosc, 1, jakie_drzewo);
+}
 
 int main() {
     int wybor;
@@ -130,7 +140,6 @@ int main() {
             case 0:
                 printf("podaj wartosc: \n");
                 scanf("%lf", &wartosc);
-
                 wstaw(&drzewko, wartosc, 0, 0);
                 break;
 
@@ -163,10 +172,13 @@ int main() {
                 break;
 
             case 5:
-
+                dodaj_drzewa(drzewko, kopiowane);
+                wypisz(drzewko, 0);
                 break;
+
             case EXIT:
                 printf("Wyjscie");
+                wypisz(drzewko, 2);
                 return 0;
         }
     }
