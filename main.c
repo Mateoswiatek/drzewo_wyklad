@@ -4,14 +4,14 @@
 
 #define EXIT 6
 
-struct element_drzewa *drzewko, *poprzedni_u;
+struct element_drzewa *drzewko, *poprzedni_u, *skopiowane;
 int a;
 
 /*
  *              wstaw do drzewa  // pierwsze nie moze byc 0;
  *              wyswietl
  *              znajdz
- *  usun   // wstawianie pozniej te usuniete,
+ *              usun   // wstawianie pozniej te usuniete przekazujemy wartosc, jako od kotrej zaczynamy, a zamiast nowo utworzonego, mamy wskaznik do "poczaktu" jednego z dziecka z tego usunietego,
  *  skopiuj drzewo
  *  doda jdrzewa
  */
@@ -84,7 +84,7 @@ struct element_drzewa *znajdz(struct element_drzewa *root, double szukana){ // n
         znajdz(root->prawy, szukana);
     }
 }
-
+//ok
 void usun(struct element_drzewa *root, double szukana_do_usuniecia){
     struct element_drzewa *do_usuniecia, *prawe, *lewe;
     if(szukana_do_usuniecia==root->wartosc){
@@ -109,6 +109,17 @@ void usun(struct element_drzewa *root, double szukana_do_usuniecia){
     if(prawe!=0){
         wstaw(&drzewko, prawe->wartosc, 1, prawe);
     }
+}
+//ok
+struct element_drzewa *skopiuj(struct element_drzewa *zrodlo){
+    struct element_drzewa *nowe_drzewo;
+
+    nowe_drzewo= malloc(sizeof(struct element_drzewa));
+    nowe_drzewo->wartosc=0; // tu mozna sprobowac dac zrodlo->wartosc;
+    nowe_drzewo->lewy=nowe_drzewo->prawy=0;
+    skopiowane=nowe_drzewo;
+    wstaw(&skopiowane, zrodlo->wartosc, 1, zrodlo);
+    return skopiowane;
 }
 
 int main() {
@@ -148,7 +159,11 @@ int main() {
                 break;
 
             case 4:
-                printf("4\n");
+                skopiuj(drzewko);
+                printf("zrodlo ma roota w %u\n a tu jego zawartosc:\n", drzewko);
+                wypisz(drzewko);
+                printf("nowo skopiowany ma roota w %u\n a tu jego zawartosc:\n", skopiowane);
+                wypisz(skopiowane);
                 break;
 
             case 5:
